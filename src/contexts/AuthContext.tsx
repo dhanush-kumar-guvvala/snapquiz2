@@ -51,10 +51,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const createProfileIfNotExists = async (userId: string, email: string, fullName: string, role: 'teacher' | 'student') => {
+    try {
+      // Check if profile already exists
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (!existingProfile) {
+        // Create profile manually if trigger failed
+        console.log('Creating profile manually for user:', userId);
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            email: email,
+            full_name: fullName,
+            role: role
+          });
+
+        if (insertError) {
+          console.error('Error creating profile manually:', insertError);
+        } else {
+          console.log('Profile created successfully');
+          // Fetch the newly created profile
+          fetchProfile(userId);
+        }
+      }
+    } catch (error) {
+      console.error('Error in createProfileIfNotExists:', error);
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -62,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Defer profile fetching to avoid potential deadlocks
           setTimeout(() => {
             fetchProfile(session.user.id);
-          }, 0);
+          }, 100);
         } else {
           setProfile(null);
         }
@@ -73,6 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -88,9 +124,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, fullName: string, role: 'teacher' | 'student') => {
     try {
+      console.log('Starting signup process for:', email, 'as', role);
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -102,8 +139,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       
+      // If signup successful but user exists, check if profile exists
+      if (data.user && !error) {
+        console.log('User created successfully:', data.user.id);
+        // Give the trigger time to run, then check if profile was created
+        setTimeout(async () => {
+          await createProfileIfNotExists(data.user.id, email, fullName, role);
+        }, 1000);
+      }
+      
       return { error };
     } catch (error) {
+      console.error('Signup error:', error);
       return { error };
     }
   };
