@@ -139,13 +139,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
       
-      // If signup successful but user exists, check if profile exists
+      // If signup successful, immediately create the profile
       if (data.user && !error) {
         console.log('User created successfully:', data.user.id);
-        // Give the trigger time to run, then check if profile was created
-        setTimeout(async () => {
-          await createProfileIfNotExists(data.user.id, email, fullName, role);
-        }, 1000);
+        
+        // Create profile immediately
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: email,
+            full_name: fullName,
+            role: role
+          });
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+          // Return a more specific error for profile creation
+          return { error: { message: 'Account created but profile setup failed. Please contact support.' } };
+        }
+        
+        console.log('Profile created successfully');
       }
       
       return { error };
