@@ -257,9 +257,27 @@ export const TeacherDashboard = () => {
                            >
                              {quiz.quiz_code}
                            </Badge>
-                           <span className="text-xs text-gray-500">(Click to copy)</span>
-                         </div>
-                        <p className="text-gray-600 mb-2">{quiz.description}</p>
+                            <span className="text-xs text-gray-500">(Click to copy)</span>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="text-sm font-medium text-gray-700">Quiz ID:</span>
+                            <Badge 
+                              variant="outline" 
+                              className="font-mono text-sm px-2 py-1 bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => {
+                                navigator.clipboard.writeText(quiz.id);
+                                toast({
+                                  title: "Copied!",
+                                  description: `Quiz ID ${quiz.id} copied to clipboard`,
+                                });
+                              }}
+                            >
+                              {quiz.id.slice(0, 8)}...{quiz.id.slice(-4)}
+                            </Badge>
+                            <span className="text-xs text-gray-500">(Click to copy full ID)</span>
+                          </div>
+                         <p className="text-gray-600 mb-2">{quiz.description}</p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <span>{quiz.total_questions} questions</span>
                           <span>{quiz.duration_minutes} minutes</span>
