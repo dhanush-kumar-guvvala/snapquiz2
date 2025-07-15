@@ -236,15 +236,29 @@ export const TeacherDashboard = () => {
                   <div key={quiz.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold">{quiz.title}</h3>
-                          <Badge variant={quiz.is_active ? "default" : "secondary"}>
-                            {quiz.is_active ? "Active" : "Inactive"}
-                          </Badge>
-                          <Badge variant="outline" className="font-mono">
-                            {quiz.quiz_code}
-                          </Badge>
-                        </div>
+                         <div className="flex items-center space-x-3 mb-2">
+                           <h3 className="text-lg font-semibold">{quiz.title}</h3>
+                           <Badge variant={quiz.is_active ? "default" : "secondary"}>
+                             {quiz.is_active ? "Active" : "Inactive"}
+                           </Badge>
+                         </div>
+                         <div className="flex items-center space-x-2 mb-2">
+                           <span className="text-sm font-medium text-gray-700">Quiz Code:</span>
+                           <Badge 
+                             variant="outline" 
+                             className="font-mono text-lg px-3 py-1 bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100 cursor-pointer"
+                             onClick={() => {
+                               navigator.clipboard.writeText(quiz.quiz_code);
+                               toast({
+                                 title: "Copied!",
+                                 description: `Quiz code ${quiz.quiz_code} copied to clipboard`,
+                               });
+                             }}
+                           >
+                             {quiz.quiz_code}
+                           </Badge>
+                           <span className="text-xs text-gray-500">(Click to copy)</span>
+                         </div>
                         <p className="text-gray-600 mb-2">{quiz.description}</p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <span>{quiz.total_questions} questions</span>
