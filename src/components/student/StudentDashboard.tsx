@@ -48,7 +48,7 @@ export const StudentDashboard = () => {
           )
         `)
         .eq('student_id', profile?.id)
-        .order('created_at', { ascending: false });
+        .order('started_at', { ascending: false });
 
       if (error) throw error;
 
@@ -109,6 +109,26 @@ export const StudentDashboard = () => {
         return;
       }
 
+      // Check if quiz is within the allowed time window
+      const now = new Date();
+      if (quiz.start_time && new Date(quiz.start_time) > now) {
+        toast({
+          title: "Quiz Not Available",
+          description: `Quiz will be available from ${new Date(quiz.start_time).toLocaleString()}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (quiz.end_time && new Date(quiz.end_time) < now) {
+        toast({
+          title: "Quiz Expired",
+          description: `Quiz was available until ${new Date(quiz.end_time).toLocaleString()}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Check if student has already attempted this quiz
       const { data: existingAttempt, error: attemptError } = await supabase
         .from('quiz_attempts')
@@ -121,16 +141,6 @@ export const StudentDashboard = () => {
         toast({
           title: "Already Attempted",
           description: "You have already taken this quiz",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Check if quiz has a start time and hasn't started yet
-      if (quiz.start_time && new Date(quiz.start_time) > new Date()) {
-        toast({
-          title: "Quiz Not Started",
-          description: `Quiz will start at ${new Date(quiz.start_time).toLocaleString()}`,
           variant: "destructive",
         });
         return;

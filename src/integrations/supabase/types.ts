@@ -91,6 +91,7 @@ export type Database = {
       quiz_attempts: {
         Row: {
           completed_at: string | null
+          created_at: string | null
           id: string
           is_completed: boolean | null
           quiz_id: string
@@ -102,6 +103,7 @@ export type Database = {
         }
         Insert: {
           completed_at?: string | null
+          created_at?: string | null
           id?: string
           is_completed?: boolean | null
           quiz_id: string
@@ -113,6 +115,7 @@ export type Database = {
         }
         Update: {
           completed_at?: string | null
+          created_at?: string | null
           id?: string
           is_completed?: boolean | null
           quiz_id?: string
@@ -144,6 +147,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           duration_minutes: number
+          end_time: string | null
           id: string
           is_active: boolean | null
           quiz_code: string
@@ -158,6 +162,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           duration_minutes?: number
+          end_time?: string | null
           id?: string
           is_active?: boolean | null
           quiz_code: string
@@ -172,6 +177,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           duration_minutes?: number
+          end_time?: string | null
           id?: string
           is_active?: boolean | null
           quiz_code?: string
