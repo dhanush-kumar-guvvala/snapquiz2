@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { QuizTaking } from './QuizTaking';
 import { QuizResults } from './QuizResults';
+import { UsernameSetup } from './UsernameSetup';
 import { BookOpen, Clock, Trophy, LogOut, Search } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -189,6 +190,11 @@ export const StudentDashboard = () => {
     setSelectedAttemptId(attemptId);
     setActiveView('results');
   };
+
+  // Show username setup if student doesn't have a username
+  if (profile && !profile.username) {
+    return <UsernameSetup onComplete={() => {}} />;
+  }
 
   if (activeView === 'quiz' && selectedQuizId) {
     return (

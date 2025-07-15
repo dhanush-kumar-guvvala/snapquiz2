@@ -21,7 +21,10 @@ interface AnalyticsData {
   };
   attempts: Array<{
     id: string;
+    student_id: string;
     student: {
+      id: string;
+      username: string | null;
       full_name: string;
       email: string;
     };
@@ -61,10 +64,13 @@ export const QuizAnalytics: React.FC<QuizAnalyticsProps> = ({ quizId, onBack }) 
         .from('quiz_attempts')
         .select(`
           id,
+          student_id,
           score,
           completed_at,
           time_taken_minutes,
           profiles!quiz_attempts_student_id_fkey (
+            id,
+            username,
             full_name,
             email
           )
@@ -107,7 +113,10 @@ export const QuizAnalytics: React.FC<QuizAnalyticsProps> = ({ quizId, onBack }) 
       // Format attempts data
       const formattedAttempts = attempts.map(attempt => ({
         id: attempt.id,
+        student_id: attempt.student_id,
         student: {
+          id: attempt.profiles?.id || attempt.student_id,
+          username: attempt.profiles?.username || null,
           full_name: attempt.profiles?.full_name || 'Unknown',
           email: attempt.profiles?.email || 'Unknown'
         },
@@ -232,13 +241,23 @@ export const QuizAnalytics: React.FC<QuizAnalyticsProps> = ({ quizId, onBack }) 
                 <div className="space-y-4">
                   {analytics.attempts.map((attempt) => (
                     <div key={attempt.id} className="flex justify-between items-center p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">{attempt.student.full_name}</p>
-                        <p className="text-sm text-gray-500">{attempt.student.email}</p>
-                        <p className="text-xs text-gray-400">
-                          Completed: {new Date(attempt.completed_at).toLocaleDateString()}
-                        </p>
-                      </div>
+                       <div>
+                         <div className="flex items-center space-x-2">
+                           <p className="font-medium">
+                             {attempt.student.username ? `@${attempt.student.username}` : attempt.student.full_name}
+                           </p>
+                           <Badge variant="outline" className="text-xs">
+                             ID: {attempt.student.id.slice(0, 8)}
+                           </Badge>
+                         </div>
+                         {attempt.student.username && (
+                           <p className="text-sm text-gray-600">{attempt.student.full_name}</p>
+                         )}
+                         <p className="text-sm text-gray-500">{attempt.student.email}</p>
+                         <p className="text-xs text-gray-400">
+                           Completed: {new Date(attempt.completed_at).toLocaleDateString()}
+                         </p>
+                       </div>
                       <div className="text-right">
                         <Badge variant={attempt.score >= 70 ? "default" : "secondary"}>
                           {attempt.score}%
