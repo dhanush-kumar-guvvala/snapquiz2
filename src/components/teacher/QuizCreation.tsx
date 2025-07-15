@@ -100,25 +100,25 @@ Format the response as a JSON array with this structure:
 
 Make sure the questions are educational, accurate, and appropriate for the topic "${topic}".`;
 
-      const response = await fetch('/api/generate-quiz', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('generate-quiz', {
+        body: { prompt },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate questions');
+      if (functionError) {
+        console.error('Edge function error:', functionError);
+        throw new Error(functionError.message || 'Failed to generate questions');
       }
 
-      const data = await response.json();
-      setGeneratedQuestions(data.questions);
+      if (!functionData || !functionData.questions) {
+        throw new Error('No questions received from AI');
+      }
+
+      setGeneratedQuestions(functionData.questions);
       setStep(3);
       
       toast({
         title: "Success!",
-        description: `Generated ${data.questions.length} questions successfully`,
+        description: `Generated ${functionData.questions.length} questions successfully`,
       });
     } catch (error) {
       console.error('Error generating questions:', error);
