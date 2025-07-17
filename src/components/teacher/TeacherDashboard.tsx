@@ -244,19 +244,21 @@ export const TeacherDashboard = () => {
                          </div>
                          <div className="flex items-center space-x-2 mb-2">
                            <span className="text-sm font-medium text-gray-700">Quiz Code:</span>
-                           <Badge 
-                             variant="outline" 
-                             className="font-mono text-lg px-3 py-1 bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100 cursor-pointer"
-                             onClick={() => {
-                               navigator.clipboard.writeText(quiz.quiz_code);
-                               toast({
-                                 title: "Copied!",
-                                 description: `Quiz code ${quiz.quiz_code} copied to clipboard`,
-                               });
-                             }}
-                           >
-                             {quiz.quiz_code}
-                           </Badge>
+                            <Badge 
+                              variant="outline" 
+                              className="font-mono text-lg px-3 py-1 bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100 cursor-pointer"
+                              onClick={() => {
+                                if (quiz.quiz_code) {
+                                  navigator.clipboard.writeText(quiz.quiz_code);
+                                  toast({
+                                    title: "Copied!",
+                                    description: `Quiz code ${quiz.quiz_code} copied to clipboard`,
+                                  });
+                                }
+                              }}
+                            >
+                              {quiz.quiz_code || 'Loading...'}
+                            </Badge>
                             <span className="text-xs text-gray-500">(Click to copy)</span>
                           </div>
                           
