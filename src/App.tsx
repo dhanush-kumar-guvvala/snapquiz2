@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { AuthPage } from "./components/auth/AuthPage";
 import { TeacherDashboard } from "./components/teacher/TeacherDashboard";
 import { StudentDashboard } from "./components/student/StudentDashboard";
+import { QuizAccess } from "./components/quiz/QuizAccess";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -60,6 +61,14 @@ const AppContent = () => {
           ) : (
             <Index />
           )
+        }
+      />
+      <Route
+        path="/quiz/:quizCode"
+        element={
+          <ProtectedRoute>
+            <QuizAccess />
+          </ProtectedRoute>
         }
       />
       <Route path="*" element={<NotFound />} />
