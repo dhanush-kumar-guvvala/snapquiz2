@@ -201,16 +201,6 @@ export const useQuizManagement = (userId?: string) => {
     }
   };
 
-  // Share quiz link
-  const shareQuizLink = (quizCode: string) => {
-    const shareUrl = `${window.location.origin}/quiz/${quizCode}`;
-    navigator.clipboard.writeText(shareUrl);
-    toast({
-      title: "Link Copied!",
-      description: "Students can now access this quiz using the copied link",
-    });
-    return shareUrl;
-  };
 
   // Join quiz by code
   const joinQuizByCode = async (quizCode: string): Promise<{ success: boolean; quiz?: Quiz; message?: string }> => {
@@ -305,7 +295,6 @@ export const useQuizManagement = (userId?: string) => {
     getQuizByCode,
     toggleQuizStatus,
     deleteQuiz,
-    shareQuizLink,
     joinQuizByCode,
     subscribeToQuizUpdates,
     

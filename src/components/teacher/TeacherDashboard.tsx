@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { QuizCreation } from './QuizCreation';
 import { QuizAnalytics } from './QuizAnalytics';
-import { Plus, BookOpen, Users, BarChart3, LogOut, Share2, Copy, ExternalLink } from 'lucide-react';
+import { Plus, BookOpen, Users, BarChart3, LogOut } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface Quiz {
@@ -261,47 +261,6 @@ export const TeacherDashboard = () => {
                             </Badge>
                             <span className="text-xs text-gray-500">(Click to copy)</span>
                            </div>
-                           
-                           {/* Shareable Link Section */}
-                           <div className="flex items-center space-x-2 mb-2">
-                             <span className="text-sm font-medium text-gray-700">Share Link:</span>
-                             <div className="flex items-center space-x-1">
-                               <Button
-                                 size="sm"
-                                 variant="outline"
-                                 className="h-7 px-2"
-                                 onClick={() => {
-                                   const shareUrl = `${window.location.origin}/quiz/${quiz.quiz_code}`;
-                                   navigator.clipboard.writeText(shareUrl);
-                                   toast({
-                                     title: "Link Copied!",
-                                     description: "Quiz link copied to clipboard",
-                                   });
-                                 }}
-                               >
-                                 <Copy className="h-3 w-3 mr-1" />
-                                 Copy Link
-                               </Button>
-                               <Button
-                                 size="sm"
-                                 variant="outline"
-                                 className="h-7 px-2"
-                                 onClick={() => {
-                                   const shareUrl = `${window.location.origin}/quiz/${quiz.quiz_code}`;
-                                   window.open(shareUrl, '_blank');
-                                 }}
-                               >
-                                 <ExternalLink className="h-3 w-3 mr-1" />
-                                 Open
-                               </Button>
-                             </div>
-                           </div>
-                           
-                           <div className="text-xs text-gray-500 mb-2">
-                             <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-                               {window.location.origin}/quiz/{quiz.quiz_code}
-                             </span>
-                           </div>
                          <p className="text-gray-600 mb-2">{quiz.description}</p>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <span>{quiz.total_questions} questions</span>
@@ -310,21 +269,6 @@ export const TeacherDashboard = () => {
                         </div>
                       </div>
                        <div className="flex items-center space-x-2">
-                         <Button
-                           size="sm"
-                           variant="outline"
-                           onClick={() => {
-                             const shareUrl = `${window.location.origin}/quiz/${quiz.quiz_code}`;
-                             navigator.clipboard.writeText(shareUrl);
-                             toast({
-                               title: "Link Copied!",
-                               description: "Students can now access this quiz using the copied link",
-                             });
-                           }}
-                         >
-                           <Share2 className="h-4 w-4 mr-1" />
-                           Share
-                         </Button>
                          <Button
                            size="sm"
                            variant="outline"
