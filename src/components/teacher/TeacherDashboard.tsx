@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,7 +16,6 @@ interface Quiz {
   topic: string;
   total_questions: number;
   duration_minutes: number;
-  is_active: boolean;
   quiz_code: string;
   created_at: string;
   _count?: {
@@ -33,6 +31,7 @@ export const TeacherDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   const fetchQuizzes = async () => {
+    if (!profile) return;
     try {
       const { data, error } = await supabase
         .from('quizzes')
@@ -40,6 +39,7 @@ export const TeacherDashboard = () => {
           *,
           quiz_attempts(count)
         `)
+        .eq('teacher_id', profile.id) // Filter quizzes by the current teacher's ID
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -67,32 +67,7 @@ export const TeacherDashboard = () => {
 
   useEffect(() => {
     fetchQuizzes();
-  }, []);
-
-  const toggleQuizStatus = async (quizId: string, isActive: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('quizzes')
-        .update({ is_active: !isActive })
-        .eq('id', quizId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `Quiz ${!isActive ? 'activated' : 'deactivated'} successfully`,
-      });
-
-      fetchQuizzes();
-    } catch (error) {
-      console.error('Error updating quiz status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update quiz status",
-        variant: "destructive",
-      });
-    }
-  };
+  }, [profile]);
 
   const deleteQuiz = async (quizId: string) => {
     if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
@@ -192,7 +167,7 @@ export const TeacherDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {quizzes.filter(q => q.is_active).length}
+                {quizzes.length}
               </div>
             </CardContent>
           </Card>
@@ -234,13 +209,10 @@ export const TeacherDashboard = () => {
               <div className="space-y-4">
                 {quizzes.map((quiz) => (
                   <div key={quiz.id} className="border rounded-lg p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
+                    <div className="flex flex-col md:flex-row justify-between items-start">
+                      <div className="flex-1 mb-4 md:mb-0">
                          <div className="flex items-center space-x-3 mb-2">
                            <h3 className="text-lg font-semibold">{quiz.title}</h3>
-                           <Badge variant={quiz.is_active ? "default" : "secondary"}>
-                             {quiz.is_active ? "Active" : "Inactive"}
-                           </Badge>
                          </div>
                          <div className="flex items-center space-x-2 mb-2">
                            <span className="text-sm font-medium text-gray-700">Quiz Code:</span>
@@ -268,7 +240,7 @@ export const TeacherDashboard = () => {
                           <span>{quiz._count?.quiz_attempts || 0} attempts</span>
                         </div>
                       </div>
-                       <div className="flex items-center space-x-2">
+                       <div className="flex flex-col md:flex-row items-stretch md:items-center space-y-2 md:space-y-0 md:space-x-2 w-full md:w-auto">
                          <Button
                            size="sm"
                            variant="outline"
@@ -276,21 +248,16 @@ export const TeacherDashboard = () => {
                              setSelectedQuizId(quiz.id);
                              setActiveView('analytics');
                            }}
+                           className="w-full md:w-auto"
                          >
                            <BarChart3 className="h-4 w-4 mr-1" />
                            Analytics
                          </Button>
                          <Button
                            size="sm"
-                           variant={quiz.is_active ? "secondary" : "default"}
-                           onClick={() => toggleQuizStatus(quiz.id, quiz.is_active)}
-                         >
-                           {quiz.is_active ? "Deactivate" : "Activate"}
-                         </Button>
-                         <Button
-                           size="sm"
                            variant="destructive"
                            onClick={() => deleteQuiz(quiz.id)}
+                           className="w-full md:w-auto"
                          >
                            Delete
                          </Button>
